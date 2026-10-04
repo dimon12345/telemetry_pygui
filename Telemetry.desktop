@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Telemetry
+Comment=Start Telemetry GUI
+Exec=/opt/telemetry/pygui/gui.sh
+Icon=utilities-terminal
+Terminal=true
+Categories=Utility;
