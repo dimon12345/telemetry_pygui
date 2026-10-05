@@ -1,1 +1,21 @@
-{"scale": {"pzem004tP": "0.01", "pzem004tV": "0.01"}, "integrate": ["pzem004tP"], "enabled": {"dht22#2#T": 1, "dht22#2#H": 0, "espDS18B20": 0, "dht22#3#T": 1, "dht22#3#H": 0, "pzem004tV": 0, "pzem004tC": 0, "pzem004tP": 0, "pzem004tE": 0, "pzem004tF": 0, "pzem004tPF": 0}, "show_settings": true}
+{
+  "scale": {
+    "pzem004tP": "0.01",
+    "pzem004tV": "0.01"
+  },
+  "integrate": ["pzem004tP"],
+  "enabled": {
+    "dht22#2#T": 1,
+    "dht22#2#H": 0,
+    "espDS18B20": 0,
+    "dht22#3#T": 1,
+    "dht22#3#H": 0,
+    "pzem004tV": 0,
+    "pzem004tC": 0,
+    "pzem004tP": 0,
+    "pzem004tE": 0,
+    "pzem004tF": 0,
+    "pzem004tPF": 0
+    },
+  "show_settings": true
+}

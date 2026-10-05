@@ -17,7 +17,7 @@ import json
 #enabled = True
 class SensorsGui:
 	def __init__(self):
-		with open("config.json", "r") as config:
+		with open("../config.json", "r") as config:
 			self.config = json.load(config)
 
 		self.remoteDb = RemoteSensorsDatabase.RemoteSensorsDatabase()
