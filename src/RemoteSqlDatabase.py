@@ -11,8 +11,8 @@ class RemoteSqlDatabase:
             self.connection = psycopg2.connect(
                 host="pg-host",
                 database="telemetry",
-                user="lexx",
-                password="xev")
+                user="telemetry",
+                password="telemetry")
 
             return True
 

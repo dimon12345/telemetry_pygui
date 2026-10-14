@@ -46,12 +46,14 @@ class RemoteSensorsDatabase(RemoteSqlDatabase.RemoteSqlDatabase):
             print("request #2")
 
             tableName = "telemetry"
-            query = """SELECT value, timestamp from {} WHERE timestamp > %s AND name_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
+#            query = """SELECT value, timestamp from {} WHERE timestamp > %s AND sensor_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
+            query = """SELECT value, timestamp from {} WHERE sensor_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
             cursor = self.getCursor()
             try:
                 print("query: ", query)
                 cursor = self.getCursor()
-                cursor.execute(query, (datetime.now() - self.interval,))
+#                cursor.execute(query, (datetime.now() - self.interval,))
+                cursor.execute(query)
                 records = cursor.fetchall()
                 print("query done")
                 for row in records:

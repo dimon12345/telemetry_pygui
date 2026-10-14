@@ -5,8 +5,8 @@ class SensorNames:
     def __init__(self, remoteDb):
         self.remoteDb = remoteDb
 
-    def updateNames(self):
-        query = """SELECT name_id, name from names;"""
+    def loadNames(self):
+        query = """SELECT id, name from sensors;"""
         cursor = self.remoteDb.getCursor()
         cursor.execute(query)
         records = cursor.fetchall()
@@ -14,21 +14,13 @@ class SensorNames:
             self.names[row[1]] = row[0]
 
     def addSensor(self, name):
-        query = """CREATE TABLE IF NOT EXISTS names (
-            name_id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL
-        )"""
-        cursor = self.remoteDb.getCursor()
-        cursor.execute(query)
-        self.remoteDb.getConnection().commit()
-
-        self.updateNames()
+        self.loadNames()
 
         if name in self.names:
             return self.names[name]
 
-        query = """INSERT INTO names(name)
-            VALUES(%s) RETURNING name_id;"""
+        query = """INSERT INTO sensors(name)
+            VALUES(%s) RETURNING id;"""
         cursor = self.remoteDb.getCursor()
         cursor.execute(query, (name,))
 
@@ -44,5 +36,5 @@ class SensorNames:
 
     def getSensorNames(self):
         if len(self.names) == 0:
-            self.updateNames()
+            self.loadNames()
         return self.names.keys()
