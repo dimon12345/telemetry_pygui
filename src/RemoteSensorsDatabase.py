@@ -1,8 +1,7 @@
 import RemoteSqlDatabase
 import SensorNames
 
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 class RemoteSensorsDatabase(RemoteSqlDatabase.RemoteSqlDatabase):
     def __init__(self):
@@ -39,21 +38,15 @@ class RemoteSensorsDatabase(RemoteSqlDatabase.RemoteSqlDatabase):
         vData = []
 
         sensorId = self.sensorNames.getSensorId(sensorName)
-        today = datetime.now()
-        yesterday = today - timedelta(days = 1)
 
         if self.showInterval:
-            print("request #2")
-
             tableName = "telemetry"
-#            query = """SELECT value, timestamp from {} WHERE timestamp > %s AND sensor_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
-            query = """SELECT value, timestamp from {} WHERE sensor_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
+            query = """SELECT value, timestamp from {} WHERE timestamp > %s AND sensor_id = {} ORDER BY timestamp;""".format(tableName, sensorId)
             cursor = self.getCursor()
             try:
                 print("query: ", query)
                 cursor = self.getCursor()
-#                cursor.execute(query, (datetime.now() - self.interval,))
-                cursor.execute(query)
+                cursor.execute(query, (datetime.now(timezone.utc) - self.interval,))
                 records = cursor.fetchall()
                 print("query done")
                 for row in records:
