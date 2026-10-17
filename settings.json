@@ -1,0 +1,15 @@
+{
+    "hide_settings": false,
+    "fullscreen": false,
+    "sensors": {
+        "fake_sensor": {
+            "disabled": true
+        },
+        "esp32": {
+            "disabled": false
+        },
+        "temp": {
+            "disabled": true
+        }
+    }
+}

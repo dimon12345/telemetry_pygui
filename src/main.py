@@ -17,24 +17,21 @@ import matplotlib.pyplot as plt
 from Config import Config, loadConfig
 import RemoteSensorsDatabase
 import SensorNames
+from Settings import Sensor, Settings, SettingsManager
 
 
 #enabled = True
 class SensorsGui:
-    def __init__(self, config: Config):
-        with open("../config_old.json", "r") as f:
-            self.config_old = json.load(f)
-
+    def __init__(self, config: Config, settings: Settings):
+        self.settings = settings
         self.remoteDb = RemoteSensorsDatabase.RemoteSensorsDatabase(config.db)
 
         self.root = tkinter.Tk()
         self.root.wm_title("Embedding in Tk")
-        self.root.attributes("-fullscreen", True)
+        self.root.attributes("-fullscreen", self.settings.fullscreen)
 
         self.root.bind("<F11>", self.toggle_fullscreen)
         self.root.bind("<Escape>", self.end_fullscreen)
-
-        self.fullscreen = True
 
         frame = tkinter.Frame(master=self.root)
         frame.grid(column=0, row=0, sticky="ns")
@@ -80,9 +77,7 @@ class SensorsGui:
         #plt.style.use('seaborn-dark')
 
     def list_settings(self):
-        show = True
-        if "show_settings" in self.config_old:
-            show = self.config_old["show_settings"]
+        show = not self.settings.hide_settings
 
         if show:
             self.frame2 = tkinter.Frame(master=self.root)
@@ -98,6 +93,8 @@ class SensorsGui:
             var = tkinter.IntVar()
             var.set(self.getCheckboxState(name))
             self.enabled[name] = var
+            if name not in self.settings.sensors:
+                self.settings.sensors[name] = Sensor(disabled=False)
 
             #self.checkboxes[name] = tkinter.Checkbutton(master=frame2, text=name, command=self.lambdas[name], variable=var)
             if show:
@@ -114,13 +111,8 @@ class SensorsGui:
 
 
     def on_show_settings(self):
-        show = True
-        if "show_settings" in self.config_old:
-            show = self.config_old["show_settings"]
-
-        show = not show
-        self.config_old["show_settings"] = show
-        self.dumpConfig()
+        show = self.settings.hide_settings
+        self.settings.hide_settings = not show
 
         if show:
             self.list_settings()
@@ -131,9 +123,7 @@ class SensorsGui:
         print("check button changed")
         sensors = dict()
         for key in self.enabled.keys():
-            sensors[key] = self.enabled[key].get()
-        self.config_old["enabled"] = sensors
-        self.dumpConfig()
+            self.settings.sensors[key].disabled = not self.enabled[key].get()
 
 #       self.generate_dummy_data()
         self.fig.canvas.draw_idle()
@@ -141,21 +131,19 @@ class SensorsGui:
         return
 
     def toggle_fullscreen(self, event):
-        self.fullscreen = not self.fullscreen  # Just toggling the boolean
-        self.root.attributes("-fullscreen", self.fullscreen)
-        return "break"
+        self.settings.fullscreen = not self.settings.fullscreen
+        self.root.attributes("-fullscreen", self.settings.fullscreen)
+        return
 
     def end_fullscreen(self, event):
-        self.fullscreen = False
+        self.settings.fullscreen = False
         self.root.attributes("-fullscreen", False)
-        return "break"
+        return
 
     def generate_dummy_data(self):
         print("generate_dummy_data start")
         names = self.remoteDb.getSensorNames()
         print("names", names)
-        scales = self.config_old["scale"]
-        integrate = self.config_old["integrate"]
         for name in names:
             t_utc, sd = self.remoteDb.getData(name)
             print("sensor data size: ", len(t_utc), len(sd))
@@ -168,40 +156,13 @@ class SensorsGui:
             else:
                 print(td[0])
 
-            if name in integrate:
-                if len(sd) > 0:
-                    lastTime = td[0]
-                    summ = 0.0
-                    for i in range(1, len(sd)):
-                        summ = summ + sd[i] * (td[i] - lastTime).total_seconds()
-                        lastTime = td[i]
-                    summ = summ / (60 * 60)
-                    print("===", name, summ)
-                    self.powerLabelVar.set("{:.2f}".format(summ))
-
-            if name in scales.keys():
-                newVals = []
-                for val in sd:
-                    newVals.append(val * float(scales[name]))
-                sd = newVals
-
             self.timeData[name] = td
             self.sensorData[name] = sd
 
         print("generate_dummy_data done")
 
-    def dumpConfig(self):
-        with open('config_old.json', 'w') as f:
-            f.write(json.dumps(self.config_old))
-
     def getCheckboxState(self, name):
-        if not "enabled" in self.config_old:
-            self.config_old["enabled"] = dict()
-
-        if name in self.config_old["enabled"]:
-            return self.config_old["enabled"][name]
-
-        return 1
+        return not self.settings.sensors[name].disabled
 
     def animate(self, i):
         self.generate_dummy_data()
@@ -231,12 +192,18 @@ def parseArgParams():
             default='config.json',
             help="Config filename (default: config.json)"
     )
+    parser.add_argument(
+            "-s", "--settings",
+            action="store", dest='settings_filepath',
+            default='settings.json',
+            help="Settings filename (default: settings.json)"
+    )
     return parser.parse_args()
 
 
 class App:
-    def __init__(self, config: Config):
-        self.sensorGui = SensorsGui(config)
+    def __init__(self, config: Config, settings: Settings):
+        self.sensorGui = SensorsGui(config, settings)
 
     def mainloop(self):
         tkinter.mainloop()
@@ -246,8 +213,9 @@ def main():
     args = parseArgParams()
     config = loadConfig(args.config_filepath)
 
-    app = App(config)
-    app.mainloop()
+    with SettingsManager(args.settings_filepath) as settings:
+        app = App(config, settings)
+        app.mainloop()
 
 
 if __name__ == "__main__":
