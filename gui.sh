@@ -7,4 +7,4 @@ if [[ -d ".venv" ]]; then
 fi
 
 cd "$(dirname "$(readlink -f "$0")")/src"
-python3 main.py --config ../config.json
+python3 main.py --config ../config.json --settings ../settings.json

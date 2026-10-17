@@ -2,7 +2,6 @@ import json
 import os
 from pydantic import BaseModel
 
-
 class PostgresConfig(BaseModel):
     host: str
     user: str
@@ -13,15 +12,15 @@ class Config(BaseModel):
     db: PostgresConfig
 
 config_instance = Config(
-    db=PostgresConfig(
-            host="pg-host",
-            user="telemetry",
-            password="telemetry",
-            dbname="telemetry"
+    db = PostgresConfig(
+            host = "pg-host",
+            user = "telemetry",
+            password = "telemetry",
+            dbname = "telemetry"
     )
 )
 
-def loadConfig(filepath: str) -> Config:
+def loadConfig(filepath:str) -> Config:
     if os.path.isfile(filepath):
         with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
