@@ -1,10 +1,14 @@
+from datetime import datetime, timedelta, timezone
+
+from Config import PostgresConfig
 import RemoteSqlDatabase
 import SensorNames
 
-from datetime import datetime, timedelta, timezone
 
 class RemoteSensorsDatabase(RemoteSqlDatabase.RemoteSqlDatabase):
-    def __init__(self):
+    def __init__(self, pg_config: PostgresConfig):
+        super().__init__(pg_config)
+
         self.setInterval60min()
         self.sensorNames = SensorNames.SensorNames(self)
         self.startTime = datetime.now()

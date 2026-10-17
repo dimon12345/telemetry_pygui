@@ -1,0 +1,1 @@
+{"scale": {"pzem004tP": "0.01", "pzem004tV": "0.01"}, "integrate": ["pzem004tP"], "enabled": {"fake_sensor": 0, "esp32": 1, "temp": 0}, "show_settings": true}

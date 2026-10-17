@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
 
+import argparse
+import copy
+from datetime import datetime
+import json
+from random import randint
+import tkinter
+
+import matplotlib
+matplotlib.use('TkAgg')
+import matplotlib.animation as animation
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+
+from Config import Config, loadConfig
 import RemoteSensorsDatabase
 import SensorNames
 
-from random import randint
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from datetime import datetime
-import tkinter
-import copy
-import json
 
 #enabled = True
 class SensorsGui:
-    def __init__(self):
-        with open("../config.json", "r") as config:
-            self.config = json.load(config)
+    def __init__(self, config: Config):
+        with open("../config_old.json", "r") as f:
+            self.config_old = json.load(f)
 
-        self.remoteDb = RemoteSensorsDatabase.RemoteSensorsDatabase()
+        self.remoteDb = RemoteSensorsDatabase.RemoteSensorsDatabase(config.db)
 
         self.root = tkinter.Tk()
         self.root.wm_title("Embedding in Tk")
@@ -77,8 +81,8 @@ class SensorsGui:
 
     def list_settings(self):
         show = True
-        if "show_settings" in self.config:
-            show = self.config["show_settings"]
+        if "show_settings" in self.config_old:
+            show = self.config_old["show_settings"]
 
         if show:
             self.frame2 = tkinter.Frame(master=self.root)
@@ -111,11 +115,11 @@ class SensorsGui:
 
     def on_show_settings(self):
         show = True
-        if "show_settings" in self.config:
-            show = self.config["show_settings"]
+        if "show_settings" in self.config_old:
+            show = self.config_old["show_settings"]
 
         show = not show
-        self.config["show_settings"] = show
+        self.config_old["show_settings"] = show
         self.dumpConfig()
 
         if show:
@@ -128,7 +132,7 @@ class SensorsGui:
         sensors = dict()
         for key in self.enabled.keys():
             sensors[key] = self.enabled[key].get()
-        self.config["enabled"] = sensors
+        self.config_old["enabled"] = sensors
         self.dumpConfig()
 
 #       self.generate_dummy_data()
@@ -150,8 +154,8 @@ class SensorsGui:
         print("generate_dummy_data start")
         names = self.remoteDb.getSensorNames()
         print("names", names)
-        scales = self.config["scale"]
-        integrate = self.config["integrate"]
+        scales = self.config_old["scale"]
+        integrate = self.config_old["integrate"]
         for name in names:
             t_utc, sd = self.remoteDb.getData(name)
             print("sensor data size: ", len(t_utc), len(sd))
@@ -187,15 +191,15 @@ class SensorsGui:
         print("generate_dummy_data done")
 
     def dumpConfig(self):
-        with open('config.json', 'w') as f:
-            f.write(json.dumps(self.config))
+        with open('config_old.json', 'w') as f:
+            f.write(json.dumps(self.config_old))
 
     def getCheckboxState(self, name):
-        if not "enabled" in self.config:
-            self.config["enabled"] = dict()
+        if not "enabled" in self.config_old:
+            self.config_old["enabled"] = dict()
 
-        if name in self.config["enabled"]:
-            return self.config["enabled"][name]
+        if name in self.config_old["enabled"]:
+            return self.config_old["enabled"][name]
 
         return 1
 
@@ -218,9 +222,33 @@ class SensorsGui:
 
         self.fig.autofmt_xdate()
 
-    def show(self):
-        #plt.show()
+
+def parseArgParams():
+    parser = argparse.ArgumentParser("PyGUI")
+    parser.add_argument(
+            "-c", "--config",
+            action="store", dest='config_filepath',
+            default='config.json',
+            help="Config filename (default: config.json)"
+    )
+    return parser.parse_args()
+
+
+class App:
+    def __init__(self, config: Config):
+        self.sensorGui = SensorsGui(config)
+
+    def mainloop(self):
         tkinter.mainloop()
 
-sensorGui = SensorsGui()
-sensorGui.show()
+
+def main():
+    args = parseArgParams()
+    config = loadConfig(args.config_filepath)
+
+    app = App(config)
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    main()

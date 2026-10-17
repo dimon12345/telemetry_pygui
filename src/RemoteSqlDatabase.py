@@ -1,19 +1,25 @@
 import psycopg2
 import time
 
+from Config import PostgresConfig
+
 
 class RemoteSqlDatabase:
-    connection = None
+    def __init__(self, pg_config: PostgresConfig):
+        self.pg_config = pg_config
+        self.connection = None
+
     def connect(self):
         if self.connection != None:
             return True
         try:
+            print("connect to db",self.pg_config.host, self.pg_config.dbname,
+                self.pg_config.user, self.pg_config.password)
             self.connection = psycopg2.connect(
-                host="pg-host",
-                database="telemetry",
-                user="telemetry",
-                password="telemetry")
-
+                host=self.pg_config.host,
+                database=self.pg_config.dbname,
+                user=self.pg_config.user,
+                password=self.pg_config.password)
             return True
 
         except Exception as e: print(e)
