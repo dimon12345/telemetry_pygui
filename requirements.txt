@@ -1,2 +1,4 @@
 psycopg2
+types-psycopg2
 matplotlib
+pydantic
