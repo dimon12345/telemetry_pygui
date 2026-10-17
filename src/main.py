@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from datetime import datetime
 import tkinter
 import copy
 import json
@@ -152,8 +153,12 @@ class SensorsGui:
         scales = self.config["scale"]
         integrate = self.config["integrate"]
         for name in names:
-            td, sd = self.remoteDb.getData(name)
-            print("sensor data size: ", len(td), len(sd))
+            t_utc, sd = self.remoteDb.getData(name)
+            print("sensor data size: ", len(t_utc), len(sd))
+            td = []
+            for t in t_utc:
+                td += [t.astimezone(None)]
+
             if len(td) == 0:
                 print("no data")
             else:
