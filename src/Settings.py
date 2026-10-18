@@ -25,7 +25,7 @@ class SettingsManager:
         self.filepath = filepath
         self.settings: Settings | None = None
 
-    def __enter__(self) -> Settings:
+    def __enter__(self):
         if os.path.exists(self.filepath):
             self.settingsLoad()
         else:
@@ -33,8 +33,7 @@ class SettingsManager:
             self.saveSettings()
         return self.settings
 
-    def __exit__(self, exc_type:type, exc_val:BaseException,
-            exc_tb:TracebackType) -> bool:
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self.saveSettings()
         return False
 
