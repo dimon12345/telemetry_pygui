@@ -24,7 +24,7 @@ class TelemetryService:
                 datetime.now(timezone.utc) - interval
             ):
                 value_data.append(telemetry[0])
-                time_data.append(telemetry[1])
+                time_data.append(telemetry[1].astimezone(None))
 
             plot_data[sensor_name] = SensorPlotData(time_data, value_data)
 
