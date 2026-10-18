@@ -13,6 +13,7 @@ from core.TelemetryRepository import TelemetryRepository
 from Config import Config
 from Settings import Settings
 from ui.TelemetryView import TelemetryView
+from ui.TelemetryPresenter import TelemetryPresenter
 
 class TkinterTelemetryWindow(TelemetryView):
     def __init__(self, presenter:TelemetryPresenter):
