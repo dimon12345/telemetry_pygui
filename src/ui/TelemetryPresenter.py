@@ -68,6 +68,10 @@ class TelemetryPresenter:
         self.settings.hide_settings = not self.settings.hide_settings
         self.updateSettingsPanel()
 
+    def onFullscreenButton(self) -> None:
+        self.settings.fullscreen = not self.settings.fullscreen
+        self.view.setFullscreen(self.settings.fullscreen)
+
     def setInterval(self, interval:timedelta) -> None:
         self.interval = interval
         plot_data = self.service.getPlotData(self.interval)

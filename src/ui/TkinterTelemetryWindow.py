@@ -70,6 +70,10 @@ class TkinterTelemetryWindow(TelemetryView):
                 command=self.root.quit)
         button.pack(expand=True, fill='both')
 
+        button = tkinter.Button(master=self.settings_frame, text="Full screen",
+                command=self.presenter.onFullscreenButton)
+        button.pack(expand=True, fill='both')
+
     def setupPlotCanvas(self) -> None:
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot()
