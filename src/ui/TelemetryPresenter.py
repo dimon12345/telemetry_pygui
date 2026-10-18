@@ -3,7 +3,7 @@ from datetime import timedelta
 from core.TelemetryRepository import TelemetryRepository
 from core.TelemetryService import TelemetryService
 
-from Settings import Settings
+from Settings import Settings, Sensor
 from ui.TelemetryView import TelemetryView
 
 class TelemetryPresenter:
