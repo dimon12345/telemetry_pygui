@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from core.SensorPlotData import SensorPlotData
+from core.TelemetryRepository import TelemetryRepository
 
 class TelemetryService:
     def __init__(self, repository:TelemetryRepository):
